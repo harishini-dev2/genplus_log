@@ -1,0 +1,139 @@
+
+
+{% load static %}
+
+<div class="wrapper">
+<div class="search-overlay"></div>
+		<div class="overlay toggle-icon"></div>
+		<!--end overlay-->
+		<!--Start Back To Top Button--> <a href="javaScript:;" class="back-to-top"><i class='bx bxs-up-arrow-alt'></i></a>
+		<!--End Back To Top Button-->
+		<footer class="page-footer">
+			<p class="mb-0">Copyright © {% now 'Y' %}. All right reserved.</p>
+		</footer>
+	</div>
+
+	
+	<!--end switcher-->
+	<!-- Bootstrap JS -->
+	<script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+	<!--plugins-->
+	<script src="{% static 'assets/js/jquery.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/simplebar/js/simplebar.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/metismenu/js/metisMenu.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/perfect-scrollbar/js/perfect-scrollbar.js' %}"></script>
+	<script src="{% static 'assets/plugins/vectormap/jquery-jvectormap-2.0.2.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/vectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+	<script src="{% static 'assets/plugins/highcharts/js/highcharts.js' %}"></script>
+	<script src="{% static 'assets/plugins/highcharts/js/exporting.js' %}"></script>
+	<script src="{% static 'assets/plugins/highcharts/js/variable-pie.js' %}"></script>
+	<script src="{% static 'assets/plugins/highcharts/js/export-data.js' %}"></script>
+	<script src="{% static 'assets/plugins/highcharts/js/accessibility.js' %}"></script>
+	<script src="{% static 'assets/plugins/apexcharts-bundle/js/apexcharts.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/input-tags/js/tagsinput.js' %}"></script>
+
+    <script>
+		new PerfectScrollbar('.dashboard-top-countries');
+	</script>
+	<script src="{% static 'assets/js/index.js' %}"></script>
+
+
+	<script>
+		$('.single-select').select2({
+			theme: 'bootstrap4',
+			width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+			placeholder: $(this).data('placeholder'),
+			allowClear: Boolean($(this).data('allow-clear')),
+		});
+		$('.multiple-select').select2({
+			theme: 'bootstrap4',
+			width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+			placeholder: $(this).data('placeholder'),
+			allowClear: Boolean($(this).data('allow-clear')),
+		});
+	</script>
+
+	<!--app JS-->
+	<script src="{% static 'assets/js/app.js' %}"></script>
+
+	<script src="{% static 'assets/plugins/datatable/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/datatable/js/dataTables.bootstrap5.min.js' %}"></script>
+    <script src="{% static 'assets/plugins/notifications/js/lobibox.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/notifications/js/notifications.min.js' %}"></script>
+	<!-- <script src="{% static 'assets/plugins/notifications/js/notification-custom-script.js' %}"></script> -->
+	<script src="{% static 'assets/plugins/Drag-And-Drop/dist/imageuploadify.min.js' %}"></script>
+
+
+  <!-- CKEditor script tags -->
+    <!-- <script src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+    <script src="{% static 'ckeditor/ckeditor-init.js' %}"></script> --> 
+	<script src="{% static 'assets/plugins/select2/js/select2.min.js' %}"></script>
+	<script src="{% static 'assets/plugins/fullcalendar/js/main.min.js' %}"></script>
+
+<!-- ``````` CHeckbox datatable -->
+
+<script src="{% static 'assets/plugins/datatable/js/dataTables.select.min.js' %}"></script>
+<script src="{% static 'assets/js/pages/data-select-custom.js' %}"></script>
+
+<script src="{% static 'assets/plugins/tinymce/tinymce.min.js' %}"></script>
+
+
+
+
+<!-- `````````````````````````````` -->
+<!-- datefilter -->
+
+=	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+=	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <!-- toast -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+	
+	<script>
+		$('.single-select').select2({
+			theme: 'bootstrap4',
+			width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+			placeholder: $(this).data('placeholder'),
+			allowClear: Boolean($(this).data('allow-clear')),
+		});
+		$('.multiple-select').select2({
+			theme: 'bootstrap4',
+			width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+			placeholder: $(this).data('placeholder'),
+			allowClear: Boolean($(this).data('allow-clear')),
+		});
+	</script>
+	<script>
+		function showToast(type, message) {
+    const options = {
+        positionClass: 'toast-top-right',
+        timeOut: 5000,
+        closeButton: true,
+        style: { width: '600px' } // Inline style to increase the width
+    };
+
+    switch (type) {
+        case 'success':
+            toastr.success(message, 'Success', options);
+            break;
+        case 'error':
+            toastr.error(message, 'Error', options);
+            break;
+        case 'info':
+            toastr.info(message, 'Info', options);
+            break;
+        case 'warning':
+            toastr.warning(message, 'Warning', options);
+            break;
+        default:
+            console.warn('Unknown toast type:', type);
+    }
+}
+
+	
+	
+	// showToast('success', 'Order placed successfully.');   ( use this in html)
+	</script>
+	

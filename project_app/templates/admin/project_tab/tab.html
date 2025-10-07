@@ -1,0 +1,123 @@
+{% load static %}
+{% include 'includes/includes_admin/headers.html' %}
+{% include 'includes/includes_admin/sidebar.html' %}
+{% include 'includes/includes_admin/navbar.html' %}
+
+<!-- Content Here -->
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="dash-wrapper">
+
+            <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+                <div class="breadcrumb-title pe-3">Task</div>
+                <div class="ps-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item">
+                                <a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Task Details</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="card">
+                    {% csrf_token %}
+                    <div class="card-body">
+                        <ul class="nav nav-pills mb-3" id="myPillsTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" id="task_details-tab" 
+                                    data-bs-toggle="pill" href="#task_details" role="tab" 
+                                    aria-controls="task_details" aria-selected="true"><b>Task Details</b></a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="important_dates-tab" 
+                                    data-bs-toggle="pill" href="#important_dates" role="tab" 
+                                    aria-controls="important_dates" aria-selected="false"><b>Important Dates</b></a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="credentials-tab" 
+                                    data-bs-toggle="pill" href="#credentials" role="tab" 
+                                    aria-controls="credentials" aria-selected="false"><b>Credentials</b></a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="notes-tab" 
+                                    data-bs-toggle="pill" href="#notes" role="tab" 
+                                    aria-controls="notes" aria-selected="false"><b>Notes</b></a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="file_manager-tab" 
+                                    data-bs-toggle="pill" href="#file_manager" role="tab" 
+                                    aria-controls="file_manager" aria-selected="false"><b>File Manager</b></a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="to_do-tab" 
+                                    data-bs-toggle="pill" href="#to_do" role="tab" 
+                                    aria-controls="to_do" aria-selected="false"><b>To-Do List</b></a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="call_log-tab" 
+                                    data-bs-toggle="pill" href="#call_log" role="tab" 
+                                    aria-controls="call_log" aria-selected="false"><b>Call Log</b></a>
+                            </li>
+                        </ul>
+                        
+                        <!-- Content for Task Details Tab -->
+                        
+                        <hr>
+                        
+                        <div id="project_report">
+                            <!-- Tab content loaded here dynamically -->
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- End of Content -->
+{% include 'includes/includes_admin/footer.html' %}
+
+<script src="{% static 'assets/plugins/tinymce/tinymce.min.js' %}"></script>
+
+<script>
+
+
+$(document).ready(function () {
+    divClone = $("#project_report").clone();
+
+    // Attach event listener for tab changes
+    $('#myPillsTab a').on('shown.bs.tab', function (e) {
+        var activeTab = $(e.target).attr('aria-controls');
+        var item_id = '{{ id }}'; // Ensure `id` is passed from the server
+        loadCustomerReport(activeTab, item_id);
+    });
+
+    // Load default tab content for Task Details
+    loadCustomerReport('task_details', '{{ id }}');
+});
+
+function loadCustomerReport(activeTab, item_id) {
+    $.ajax({
+        url: '/load_task_tab/',
+        type: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        data: {
+            'tab_id': activeTab,
+            'item_id': item_id
+        },
+        success: function (response) {
+            $('#project_report').html(response);
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+
+</script>

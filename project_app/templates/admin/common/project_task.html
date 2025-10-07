@@ -1,0 +1,289 @@
+{% load static %}
+{% include 'includes/includes_admin/headers.html' %}
+{% include 'includes/includes_admin/sidebar.html' %}
+{% include 'includes/includes_admin/navbar.html' %}
+<!-- Content Here -->
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="dash-wrapper">
+            <div class="page-breadcrumb d-none d-sm-flex align-items-centers-center mb-3">
+                <div class="breadcrumb-title pe-3">Task Library</div>
+                <div class="ps-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Projects  &nbsp;   
+                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#add_modal">Add</button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="refresh_data()">Refresh</button>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>               
+            </div> 
+
+            <div class="modal fade" id="add_modal"  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h6 class="modal-title" id="staticBackdropLabel">Add Task Library</h6>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="add_form">
+                                <div class="modal-body">
+                                    {% csrf_token %}
+                                    <div class="row">
+                                        <div class="col-12 mb-3">
+                                            <label for="name" class="form-label">Name</label>
+                                            <input class="form-control" type="text" id="name" name="name">
+                                        </div>                                        
+                                        <div class="col-12 mb-3">
+                                            <label for="description" class="form-label">Description</label>
+                                            <textarea class="form-control" id="description" rows="3" name="description"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <input type="hidden" name="is_active" value="1">
+                                    <input type="hidden" name="project_id" id="project_id" value="{{project_id}}">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                </div>
+                            </form>
+                        </div>                   
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="edit_modal"  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h6 class="modal-title" id="staticBackdropLabel">Edit Task Library</h6>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="edit_form">
+                            <div class="modal-body">
+                                {% csrf_token %}                                            
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="edit_name" class="form-label">Name</label>
+                                        <input class="form-control" type="text" id="edit_name" name="name">
+                                    </div>                                    
+                                    <div class="col-6 mb-3">
+                                        <label for="edit_is_active" class="form-label">Status</label> 
+                                        <select class=" form-control single-select" id="edit_is_active" name="is_active">
+                                            <option value="1">Active</option>
+                                            <option value="0">Inactive</option>                 
+                                        </select> 
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label for="edit_description" class="form-label">Description</label>
+                                        <textarea class="form-control" id="edit_description" rows="3" name="descriptions"></textarea>
+                                    </div>                                                                                    
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <input type="hidden" name="id" id="edit_id">
+                                <input type="hidden" name="project_id" id="project_id" value="{{project_id}}">
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-success">Update</button>
+                            </div>
+                        </form>                   
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="ms-2 mb-3 mt-3">Tasks for {{project_name}}</h4>                     
+                    <div class="table-responsive mt-4">
+                        <table id="datatable" class="table table-striped table-bordered nowrap">
+                            {% csrf_token %}
+                             <thead>
+                                <tr>
+                                    <th>ID #</th>
+                                    <th>Action</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>                            
+                            </tbody>
+                        </table>  
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<!-- End of Content -->
+{% include 'includes/includes_admin/footer.html' %}
+
+
+<script type="text/javascript">
+    $("#add_form").submit(function (e) {
+     e.preventDefault(); 
+     $.ajax({
+         type: 'POST',
+         url: '/project_task_add/',
+         data: $(this).serialize(), 
+         success: function (response) { 
+            if (response.message === 'error') {  
+                showToast('warning','Yo do not have permission to add customer');                    
+                $('#add_modal').modal('hide');                  
+            }
+             else if (response.data === 'Success') { 
+                showToast('success','Task details added successfully');                   
+                 $('#add_modal').modal('hide'); 
+                 $('#add_form').trigger('reset'); 
+                 table.ajax.reload(); 
+             } else {
+                showToast('error','Failed to add task')
+             }
+         },
+         error: function(xhr, status, error) {
+           showToast('error','An error occured')
+         }
+     });
+ });
+
+
+
+ var table = $('#datatable').DataTable({
+     "processing": true,
+     "pageLength": 50,
+     "destroy": true,
+     "order": [],
+     "columns": [
+        { "data": "id", "title": "ID" },            
+        { "data": "action", "title": "Action" }, 
+        { "data": "name", "title": "Name" },   
+        { "data": "desc", "title": "Descriptions" },
+        { "data": "status", "title": "Status" }
+     ], 
+     "ajax": {
+         "url": '/project_task_view/',
+         "type": "POST",
+         "data": function(data){
+             data.csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+             data.project = $('#project_id').val();
+         },
+         "dataSrc": function(json) {
+             if (json.message === 'error') {
+                 
+                 console.log('access denied')
+                 return [];
+             }
+
+             // Log and return the valid data
+             console.log(json);
+             return json.data;
+         }
+
+     }
+ });
+
+
+ function refresh_data()
+ {
+     table.ajax.reload();
+ }
+
+
+function project_task_edit(id, name) {
+ var tkn = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+ $.post('/project_task_edit/', {id: id, csrfmiddlewaretoken: tkn}, function(res) {
+     $('#edit_id').val(res.id);
+     $('#edit_name').val(res.name);
+     $('#edit_description').val(res.descriptions);        
+     $('#edit_is_active').val(res.is_active).trigger("change");         
+     $('#edit_modal').modal('show');
+ });
+}
+
+
+
+
+
+$("#edit_form").submit(function (e) {
+ e.preventDefault();
+ var formData = new FormData(this);
+
+ var dataArray = [];
+ for (var pair of formData.entries()) {
+     dataArray.push(pair);
+ }
+
+ var serializedData = {};
+ 
+ dataArray.forEach(function(pair) {
+     serializedData[pair[0]] = pair[1];
+ });
+
+ $.ajax({
+     type: 'POST',
+     url: '/project_task_update/',
+     data:  serializedData,
+     success: function (response) { 
+          if (response.message === 'error') { 
+
+            showToast('warning','Access denied! You do not have permission to update Task')
+            $('#edit_modal').modal('hide');                  
+         }
+         else if (response.message === 'success') {
+            showToast('success','Task details updated successfully');
+            $('#edit_modal').modal('hide');                  
+             
+         } else {
+             showToast('error','Failed to update')
+         }
+         $('#edit_modal').modal('hide');
+         $('#edit_form').trigger('reset');
+         table.ajax.reload();
+     },
+     error: function(xhr, errmsg, err){
+         console.log(xhr.status + ": " + xhr.responseText);
+         showToast('error','Failed to update customer')
+        
+         $('#edit_modal').modal('hide');
+     }
+ });
+});
+
+function project_task_delete(id) {
+     if (confirm('Are you sure you want to delete this data?')) {
+         $.ajax({
+             url: "/project_task_delete/",
+             method: "POST",
+             data: { 
+                 id: id, 
+                 csrfmiddlewaretoken: '{{ csrf_token }}' 
+             },
+             dataType: "json",
+             success: function(data) {
+                 if (data.message === 'error') {  
+                    showToast('warning','Access Denied!, You do not have permission to delete');
+                                   
+                 } 
+                 else if (data.message === 'yes') {
+                    showToast('success','Task Detials deleted successfully');                    
+                     table.ajax.reload(); 
+                 } else {
+                    showToast('error',"Failed to delete task");
+                    
+                 }
+             },
+         });
+
+     }
+ }
+
+ function refresh_data(){
+    table.ajax.reload();
+ }
+</script>

@@ -1,0 +1,302 @@
+{% load static %}
+
+<div class="card-body">
+    <div class="d-flex align-items-center mb-3">
+        <div class="pe-3">
+            <span class="h4">File Manager</span>
+            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal"
+                data-bs-target="#add_modal">Add</button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="refresh_data()">Refresh</button>
+        </div>
+    </div>
+
+    <div class="table-responsive mt-4">
+        <table id="datatable" class="table table-striped table-bordered nowrap">
+            {% csrf_token %}
+            <thead>
+                <tr>
+                    <th>ID #</th>
+                    <th>Action</th>
+                    <th>Name</th>
+                    <th>File Name</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="modal fade" id="add_modal"  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="staticBackdropLabel">Add File Manager</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="add_form">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input class="form-control" type="text" id="name" name="name">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="name" class="form-label">File</label>
+                                <input class="form-control" type="file" id="file" name="file">
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="task_id" name="task_id" value="{{item_id}}">
+                        <input type="hidden" id="project_id" name="project_id" value="{{project_id}}">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>                   
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="edit_modal"  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="staticBackdropLabel">Edit File Manager</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit_form">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input class="form-control" type="text" id="edit_name" name="name">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="name" class="form-label">File</label>
+                                <input class="form-control" type="file" id="file" name="file">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="name" class="form-label">Status</label>
+                                <select class="form-control single-select" id="edit_is_active" name="is_active">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
+                                </select>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="edit_id" name="id">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>                   
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for single and multiple selects
+        $('.single-select').select2({
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            allowClear: Boolean($(this).data('allow-clear')),
+        });
+
+        $('.multiple-select').select2({
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            allowClear: Boolean($(this).data('allow-clear')),
+        });
+        
+    });
+</script>
+
+
+<script>
+    $("#add_form").submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: 'POST',
+            url: '/files_add/',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.message === 'error') { 
+                    showToast('warning','You do not have permission to add details');                    
+                    $('#add_modal').modal('hide');                  
+                }
+
+                else if (response.message === 'success') {
+                    showToast('success','File Attached successfully');               
+
+                    $('#add_modal').modal('hide');
+                    $('#add_form').trigger('reset');
+                    table.ajax.reload();
+                } else {       
+                    showToast('success','Failed to attach file');   
+                    $('#edit_modal').modal('hide');
+                }
+            },
+            error: function (xhr, errmsg, err) {
+                showToast('error','An Error occured while proccessing');
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+    });
+
+
+
+    var table = $('#datatable').DataTable({
+            "processing": true,
+            "pageLength": 50,
+            "destroy": true,
+            "order": [],
+            "columns": [
+                { "data": "id", "title": " ID #" },
+                { "data": "action", "title": "Action" }, 
+                { "data": "name", "title": " Name" },
+                { "data": "file", "title": " File Name" }
+            ], 
+            "ajax": {
+                "url": '/file_view/',
+                "type": "POST",
+                "data": function(data){
+                    data.csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+                    data.task = $('#task_id').val()
+                },
+                "dataSrc": function(json) {
+                    if (json.message === 'error') {
+                        
+                        console.log('access denied')
+                        return [];
+                    }
+
+                    // Log and return the valid data
+                    console.log(json);
+                    return json.data;
+                }
+            }
+        });
+
+
+        function file_edit(id,name) {
+            var tkn= document.getElementsByName("csrfmiddlewaretoken")[0].value;
+            $.post('/file_edit/', {id:id, csrfmiddlewaretoken:tkn }, function(res) {
+                $('#edit_id').val(res.id); 
+                $('#edit_name').val(res.name);
+                $('#edit_descriptions').val(res.descriptions);
+                $('#edit_is_active').val(res.is_active).trigger("change"); 
+                $('#edit_modal').modal('show');
+            });
+        }
+
+
+        $("#edit_form").submit(function (e) {
+            console.log('***********')
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                type: 'POST',
+                url: '/file_update/',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) { 
+                    if (response.message === 'error') { 
+                        showToast('warning','Access Denied! You do not have permission to update');
+                        
+                        $('#edit_modal').modal('hide');                  
+                    }
+
+                    else if (response.message === 'success') {
+                        showToast('success','File updated successfully');                    
+                        $('#edit_modal').modal('hide');
+                        $('#edit_form')[0].reset();  
+                        table.ajax.reload();
+                    } else {
+                        showToast('error','Failed to update file');               
+                        $('#edit_modal').modal('hide');
+                    }
+                },
+                error: function(xhr, errmsg, err){
+                    showToast('error',"failed to update")
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        });
+
+
+        function file_delete(id) {
+        if (confirm('Are you sure you want to delete this data?')) {
+            $.ajax({
+                url: "/file_delete/",
+                method: "POST",
+                data: {
+                    id: id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                dataType: "json",
+                success: function (data) {
+                    if (data.message === 'error') {
+                        showToast('warning', 'Access Denied!, You do not have permission to delete');
+
+                    }
+                    else if (data.message === 'yes') {
+                        showToast('success', 'File deleted successfully');
+                        table.ajax.reload();
+                    } else {
+                        showToast('error', "Failed to delete ");
+
+                    }
+                },
+            });
+
+        }
+    }
+
+
+    function downloadFile(fileUrl) {
+    console.log('Attempting to download file...');
+    console.log('Received file URL:', fileUrl);
+
+    if (fileUrl) {
+        console.log('Creating download link...');
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = ''; // Let the browser use the filename from the server
+
+        // Append the link to the DOM temporarily
+        document.body.appendChild(link);
+        console.log('Initiating file download...');
+        link.click(); // Trigger the download
+        document.body.removeChild(link); // Clean up the DOM
+        console.log('Download link removed from DOM.');
+    } else {
+        console.error('File URL is invalid or not available.');
+        alert('File not available for download.');
+    }
+}
+
+
+
+
+</script>

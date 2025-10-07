@@ -1,0 +1,375 @@
+{% load static %}
+{% include 'includes/includes_admin/headers.html' %}
+{% include 'includes/includes_admin/sidebar.html' %}
+{% include 'includes/includes_admin/navbar.html' %}
+<!-- Content Here -->
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="dash-wrapper">
+            <div class="page-breadcrumb d-none d-sm-flex align-items-centers-center mb-4">
+                <div class="breadcrumb-title pe-3">Staff Log</div>
+                <div class="ps-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Staff Log &nbsp
+                                <button type="button" class="btn btn-sm btn-primary" onclick="refresh_data()">Refresh</button>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>               
+            </div> 
+
+            <div class="row">
+                <div class="col-5">
+                    <div class="card">
+                        <div class="card-body">    
+                            <form id="add_form">
+                                <div class="modal-body">
+                                    {% csrf_token %}                                            
+                                    <div class="row">
+                                        <div class="col-6 mb-4">
+                                            <label for="edit_name" class="form-label">From Date</label>
+                                            <input class="form-control" type="date" id="from_date" name="from_date">
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="edit_name" class="form-label">To Date</label>
+                                            <input class="form-control" type="date" id="to_date" name="to_date">
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="edit_name" class="form-label">Start Time</label>
+                                            <input class="form-control" type="time" id="start_time" name="start_time">
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="edit_name" class="form-label">End Time</label>
+                                            <input class="form-control" type="time" id="end_time" name="end_time">
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="edit_name" class="form-label">Project</label>
+                                            <select class=" form-control single-select" id="project_id" name="project_id">
+                                                <option value="">Select</option>
+                                                {% for k in project %}
+                                                <option value="{{k.id}}">{{k.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="edit_name" class="form-label">Task</label>
+                                            <select class=" form-control single-select" id="task_id" name="task_id">
+                                            </select>
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="edit_name" class="form-label">File</label>
+                                            <input class="form-control" type="file" id="file" name="file">
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="task_status" class="form-label">Status</label> 
+                                            <select class=" form-control single-select" id="task_status" name="task_status">
+                                                <option value="pending">Pending</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="on_hold">On Hold</option>                 
+                                                <option value="completed">Completed</option>                 
+                                            </select> 
+                                        </div>
+                                       
+                                        <div class="col-6 mb-4">
+                                            <label for="description" class="form-label">Task Description</label>
+                                            <textarea class="form-control" id="task_descriptions" rows="4" name="task_descriptions"></textarea>
+                                        </div>
+                                        <div class="col-6 mb-4">
+                                            <label for="description" class="form-label">Issue Description</label>
+                                            <textarea class="form-control" id="issue_descriptions" rows="4" name="issue_descriptions"></textarea>
+                                        </div>
+                                    </div> 
+                                </div>
+                                <div class="modal-footer">
+                                    <input type="hidden" name="id" id="edit_id">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-success">save</button>
+                                </div>
+                            </form>                              
+                        </div>
+                    </div>
+                </div>
+                <div class="col-7">
+                    <div class="card">
+                        <div class="card-body">   
+                            <div class="table-responsive mt-4">
+                                <table id="datatable" class="table table-striped table-bordered nowrap">
+                                    {% csrf_token %}
+                                    <thead>
+                                        <tr>
+                                            <th>ID #</th>
+                                            <th>Action</th>
+                                            <th>From Date</th>
+                                            <th>To Date</th>
+                                            <th>Start Time</th>
+                                            <th>End Time</th>
+                                            <th>Project</th>
+                                            <th>Task</th>
+                                            <th>Staff</th>
+                                            <th>Task Descriptions</th>
+                                            <th>Issue Descriptions</th>
+                                            <th>Approved</th>
+                                            <th>Task Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>                            
+                                    </tbody>
+                                </table>  
+                            </div> 
+                                                 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+
+        </div>
+    </div>
+</div>
+<!-- End of Content -->
+{% include 'includes/includes_admin/footer.html' %}
+
+
+<script>
+
+    var currentDate = new Date().toISOString().split('T')[0];
+    document.getElementById('from_date').value = currentDate;
+    document.getElementById('to_date').value = currentDate;
+
+
+    
+
+    var table = $('#datatable').DataTable({
+            "processing": true,
+            "pageLength": 50,
+            "destroy": true,
+            "order": [],
+            "columns": [
+                { "data": "id", "title": " ID #" },
+                { "data": "action", "title": "Action" }, 
+                { "data": "from", "title": " From date" },
+                { "data": "to", "title": " To Date" },
+                { "data": "start", "title": " Start Time" },
+                { "data": "end", "title": "End Time" },
+                { "data": "project", "title": "Project" },
+                { "data": "task", "title": "Task" },
+                { "data": "staff", "title": "Staff" },
+                { "data": "desc", "title": "Task descriptions" },
+                { "data": "issue", "title": "Issue descriptions" },
+                { "data": "approve", "title": "Approved" },
+                { "data": "status", "title": "Task Status" },
+            ], 
+            "ajax": {
+                "url": '/staff_log_view/',
+                "type": "POST",
+                "data": function(data){
+                    data.csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+                },
+                "dataSrc": function(json) {
+                    if (json.message === 'error') {
+                        
+                        console.log('access denied')
+                        return [];
+                    }
+
+                    // Log and return the valid data
+                    console.log(json);
+                    return json.data;
+                }
+            }
+        });
+
+
+
+
+
+
+        $("#add_form").submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            var logId = $('#edit_id').val(); 
+            
+            var url = logId ? '/staff_update/' : '/log_add/'; // Determine URL based on presence of ID
+            var successMessage = logId ? 'Staff Log updated successfully' : 'Staff log added successfully';
+            var errorMessage = logId ? 'Failed to update log' : 'Failed to add log';
+            var modalToClose = logId ? '#edit_modal' : '#add_modal';
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.message === 'error') {
+                        showToast('warning', logId ? 'Access Denied! You do not have permission to update' : 'You do not have permission to add details');
+                        $(modalToClose).modal('hide');
+                    } else if (response.message === 'success') {
+                        showToast('success', successMessage);
+                       
+                        $('#add_form').trigger('reset');
+                        $('#project_id').val('').trigger('change');
+                        $('#task_id').val('').trigger('change');
+                        $('#task_status').val('').trigger('change');
+                        var currentDate = new Date().toISOString().split('T')[0];
+                        document.getElementById('from_date').value = currentDate;
+                        document.getElementById('to_date').value = currentDate;
+                        
+
+                        table.ajax.reload();
+                    } else {
+                        showToast('error', errorMessage);
+                        $(modalToClose).modal('hide');
+                    }
+                },
+                error: function (xhr, errmsg, err) {
+                    showToast('error', 'An error occurred while processing');
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+        });
+
+        function refresh_data(){
+            table.ajax.reload();
+        }
+
+        function log_delete(id) {
+            if (confirm('Are you sure you want to delete this data?')) {
+                $.ajax({
+                    url: "/log_delete/",
+                    method: "POST",
+                    data: { 
+                        id: id, 
+                        csrfmiddlewaretoken: '{{ csrf_token }}' 
+                    },
+                    dataType: "json",
+
+                    success: function(data) {
+                        if (data.message === 'error') {  
+                            showToast('warning','Access Denied!,You do not have permission to delete log details ');                        
+                                            
+                        } else if (data.message === 'yes') {
+                            showToast('success','Log details deleted successfully')
+                        
+                            table.ajax.reload();
+                        } else {
+                            showToast('error','Failed to delete log')
+                            
+                        }
+                    }
+                    
+                });
+
+            }
+        }
+
+
+        function log_approval(id) {        
+            $.ajax({
+                url: "/log_approval/",
+                method: "POST",
+                data: { 
+                    id: id, 
+                    csrfmiddlewaretoken: '{{ csrf_token }}' 
+                },
+                dataType: "json",
+
+                success: function(data) {
+                    if (data.message === 'error') {  
+                        showToast('warning','Access Denied!,You do not have permission to approve log details ');                        
+                                        
+                    } else if (data.message === 'yes') {
+                        showToast('success','Log Approved successfully')
+                       
+                        table.ajax.reload();
+                    } else {
+                        showToast('error','Failed to approve log')
+                        
+                    }
+                }
+                
+            });
+
+        }
+
+        
+</script>
+
+<script>
+function log_edit(id) {
+    var tkn = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+
+    $.post('/log_edit/', { id: id, csrfmiddlewaretoken: tkn }, function (res) {
+        console.log('Edit response:', res);
+
+        $('#edit_id').val(res.id); 
+        $('#from_date').val(res.start_date);
+        $('#to_date').val(res.to_date);
+        $('#start_time').val(res.start_time);
+        $('#end_time').val(res.end_time);
+
+        $('#project_id').val(res.project_id).trigger('change');
+
+        setTimeout(function () {
+            loadTasks(res.project_id, '#task_id', function () {
+                $('#task_id').val(res.task_id).trigger('change');
+                console.log('Task ID set to:', res.task_id);
+            });
+        }, 100);
+
+        $('#task_status').val(res.task_status).trigger('change');
+        $('#task_descriptions').val(res.task_descriptions);
+        $('#issue_descriptions').val(res.issue_descriptions);
+
+        $('html, body').animate({
+            scrollTop: $("#add_form").offset().top
+        }, 500);
+    }).fail(function () {
+        alert('Error loading task details.');
+    });
+}
+
+function loadTasks(projectId, targetDropdown, callback = null) {
+    console.log('Loading tasks for projectId:', projectId);
+
+    if (projectId) {
+        $.ajax({
+            url: '/fetch_task/' + projectId + '/',
+            method: 'GET',
+            success: function (response) {
+                console.log('Task response:', response);
+
+                $(targetDropdown).empty();
+                $(targetDropdown).append('<option value="">Select</option>');
+
+                if (response.projects) {
+                    $.each(response.projects, function (index, task) {
+                        $(targetDropdown).append(
+                            `<option value="${task.id}">${task.name}</option>`
+                        );
+                    });
+                }
+
+                // Execute callback after loading tasks
+                if (callback) callback();
+            },
+            error: function (xhr) {
+                console.error('Error loading tasks:', xhr.responseText);
+            },
+        });
+    } else {
+        $(targetDropdown).empty();
+        $(targetDropdown).append('<option value="">Select</option>');
+    }
+}
+
+// Attach change event to project dropdowns
+$('#project_id').on('change', function () {
+    const projectId = $(this).val();
+    loadTasks(projectId, '#task_id');
+});
+</script>

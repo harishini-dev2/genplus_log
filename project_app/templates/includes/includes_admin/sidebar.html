@@ -1,0 +1,95 @@
+{% load static %}
+
+<div class="wrapper">
+    <!--sidebar wrapper -->
+    <div class="sidebar-wrapper" data-simplebar="true">
+        <div class="sidebar-header">
+            <div>
+                <img src="{% static 'assets/images/logo/logo-1.png' %}" class="logo-icon" alt="logo icon" style="width: 40px;">
+            </div>
+            <div>
+                <h3 class="logo-text ms-2">&nbspPROJECT</h3>
+            </div>
+            <div class="toggle-icon ms-auto"><i class='bx bx-first-page'></i>
+            </div>
+        </div>
+        <!--navigation-->
+        <ul class="metismenu" id="menu">
+            <li>
+                <a href="/dashboard">
+                    <div class="parent-icon"><i class='bx bx-home'></i>
+                    </div>
+                    <div class="menu-title">Dashboard</div>
+                </a>
+
+            </li>
+            <li>
+                <a href="javascript:;" class="has-arrow">
+                    <div class="parent-icon"><i class='bx bx-spa'></i>
+                    </div>
+                    <div class="menu-title">Master</div>
+                </a>
+                <ul>
+                    <li> <a href="/company/admin"><i class="bx bx-right-arrow-alt"></i>Company</a>
+                    </li>
+                    <li> <a href="/employee"><i class="bx bx-right-arrow-alt"></i>Employee</a>
+                    </li>
+                    <li> <a href="/user_privilege"><i class="bx bx-right-arrow-alt"></i>User Privilege</a>
+                    </li>
+                    <li> <a href="/category"><i class="bx bx-right-arrow-alt"></i>Category</a>
+                    </li>                    
+                </ul>
+            </li>
+
+            <li>
+                <a href="/customer">
+                    <div class="parent-icon"><i class='bx bx-atom'></i>
+                    </div>
+                    <div class="menu-title">Customers</div>
+                </a>
+            </li> 
+
+            <li>
+                <a href="/project">
+                    <div class="parent-icon"><i class='bx bxs-grid'></i>
+                    </div>
+                    <div class="menu-title">Projects</div>
+                </a>
+            </li> 
+
+            <li>
+                <a href="/task">
+                    <div class="parent-icon"><i class='bx bx-briefcase-alt-2'></i>
+                    </div>
+                    <div class="menu-title">Tasks</div>
+                </a>
+            </li>     
+            <li>
+                <a href="/staff_log">
+                    <div class="parent-icon"><i class='bx bx-chat'></i>
+                    </div>
+                    <div class="menu-title">Daily Log</div>
+                </a>
+            </li> 
+            
+
+            <li>
+                <a href="#">
+                    <div class="parent-icon"><i class='bx bx-chat'></i>
+                    </div>
+                    <div class="menu-title">Tickets</div>
+                </a>
+            </li>
+                 
+            <li>
+                <a href="#">
+                    <div class="parent-icon"><i class='bx bx-chat'></i>
+                    </div>
+                    <div class="menu-title">Reports</div>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+
+</div>

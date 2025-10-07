@@ -1,0 +1,181 @@
+{% load static %}
+{% include 'includes/includes_admin/headers.html' %}
+{% include 'includes/includes_admin/sidebar.html' %}
+{% include 'includes/includes_admin/navbar.html' %}
+<!-- Content Here -->
+
+<div class="page-wrapper">
+    <div class="page-content">
+        <div class="dash-wrapper">
+
+            <div class="page-breadcrumb d-none d-sm-flex align-items-centers-center mb-3">
+                <div class="breadcrumb-title pe-3">Staff Log</div>
+                <div class="ps-3">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 p-0">
+                            <li class="breadcrumb-item"><a href="javascript:;"><i class="bx bx-home-alt"></i></a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Staff log  &nbsp;   
+                                <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#add_modal">Add</button>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="refresh_data()">Refresh</button>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>               
+            </div> 
+
+           
+
+            <div class="card">
+                <div class="card-body">                     
+                    <div class="table-responsive mt-4">
+                        <table id="datatable" class="table table-striped table-bordered nowrap">
+                            {% csrf_token %}
+                            <thead>
+                                <tr>
+                                    <th>ID #</th>
+                                    <th>Action</th>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Project</th>
+                                    <th>Task</th>
+                                    <th>Staff</th>
+                                    <th>Task Descriptions</th>
+                                    <th>Issue Descriptions</th>
+                                    <th>Approved</th>
+                                    <th>Task Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>                            
+                            </tbody>
+                        </table>  
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- End of Content -->
+{% include 'includes/includes_admin/footer.html' %}
+<script type="text/javascript">
+    
+
+
+
+ 
+
+
+ function refresh_data()
+ {
+     table.ajax.reload();
+ }
+
+
+
+
+
+
+
+ var table = $('#datatable').DataTable({
+            "processing": true,
+            "pageLength": 50,
+            "destroy": true,
+            "order": [],
+            "columns": [
+                { "data": "id", "title": " ID #" },
+                { "data": "action", "title": "Action" }, 
+                { "data": "from", "title": " From date" },
+                { "data": "to", "title": " To Date" },
+                { "data": "start", "title": " Start Time" },
+                { "data": "end", "title": "End Time" },
+                { "data": "project", "title": "Project" },
+                { "data": "task", "title": "Task" },
+                { "data": "staff", "title": "Staff" },
+                { "data": "desc", "title": "Task descriptions" },
+                { "data": "issue", "title": "Issue descriptions" },
+                { "data": "approve", "title": "Approved" },
+                { "data": "status", "title": "Task Status" },
+            ], 
+            "ajax": {
+                "url": '/staff_log_view/',
+                "type": "POST",
+                "data": function(data){
+                    data.csrfmiddlewaretoken = document.getElementsByName("csrfmiddlewaretoken")[0].value;
+                },
+                "dataSrc": function(json) {
+                    if (json.message === 'error') {
+                        
+                        console.log('access denied')
+                        return [];
+                    }
+
+                    // Log and return the valid data
+                    console.log(json);
+                    return json.data;
+                }
+            }
+        });
+
+
+        function log_delete(id) {
+            if (confirm('Are you sure you want to delete this data?')) {
+                $.ajax({
+                    url: "/log_delete/",
+                    method: "POST",
+                    data: { 
+                        id: id, 
+                        csrfmiddlewaretoken: '{{ csrf_token }}' 
+                    },
+                    dataType: "json",
+
+                    success: function(data) {
+                        if (data.message === 'error') {  
+                            showToast('warning','Access Denied!,You do not have permission to delete log details ');                        
+                                            
+                        } else if (data.message === 'yes') {
+                            showToast('success','Log details deleted successfully')
+                        
+                            table.ajax.reload();
+                        } else {
+                            showToast('error','Failed to delete log')
+                            
+                        }
+                    }
+                    
+                });
+
+            }
+        }
+
+
+        function log_approval(id) {        
+            $.ajax({
+                url: "/log_approval/",
+                method: "POST",
+                data: { 
+                    id: id, 
+                    csrfmiddlewaretoken: '{{ csrf_token }}' 
+                },
+                dataType: "json",
+
+                success: function(data) {
+                    if (data.message === 'error') {  
+                        showToast('warning','Access Denied!,You do not have permission to approve log details ');                        
+                                        
+                    } else if (data.message === 'yes') {
+                        showToast('success','Log Approved successfully')
+                       
+                        table.ajax.reload();
+                    } else {
+                        showToast('error','Failed to approve log')
+                        
+                    }
+                }
+                
+            });
+
+        }
+    
+</script>

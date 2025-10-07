@@ -1,0 +1,208 @@
+{% load static %}
+
+
+<div class="card-body">
+    <!-- <div class="d-flex align-items-center mb-3">
+        <div class="pe-3">
+            <span class="h4"></span>
+            
+        </div>
+    </div> -->
+
+    <div>
+        <form id="edit_form">
+            <div class="modal-body">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label"><span
+                                style="color: red;">*</span>Project</label>
+                        <select class="form-control single-select" id="edit_project_id"
+                            name="project">
+                            {% for k in project %}
+                            <option value="{{k.id}}">{{k.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Task </label>
+                        <input class="form-control" type="text" id="edit_name" name="name">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Staff</label>
+                        <select class="form-control multiple-select" id="edit_staff_id" name="staff_id" multiple="multiple">
+                            {% for k in staff %}
+                            <option value="{{k.id}}">{{k.name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Priority</label>
+                        <select class="form-control single-select" id="edit_priority"
+                            name="priority">
+                            <option value="critical">Critical</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Task Status</label>
+                        <select class="form-control single-select" id="edit_status"
+                            name="task_status">
+                            <option value="completed">Completed</option>
+                            <option value="open">open</option>
+                            <option value="hold">hold</option>
+                            <option value="partial">Partial</option>
+                            <option value="pending" selected>Pending</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Start date</label>
+                        <input class="form-control" type="date" id="edit_start" name="start">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Due date</label>
+                        <input class="form-control" type="date" id="edit_end" name="end">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Status</label>
+                        <select class="form-control multiple-select" id="edit_is_active"
+                            name="is_active">
+                            <option value="1">Active</option>
+                            <option value="0">Inctive</option>
+                        </select>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">Contribution</label>
+                        <input class="form-control" type="text" id="edit_percentage"
+                            name="percentage">
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label for="name" class="form-label">File</label>
+                        <input class="form-control" type="file" id="file" name="file">
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit_descriptions" rows="3"
+                            name="descriptions">{{task.descriptions}}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" name="is_active" value="1">
+                <input type="hidden" id="edit_id" name="id">
+                <a href="/task"><button type="button" class="btn btn-danger">Back</button></a>
+                <button type="submit" class="btn btn-success">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 for single and multiple selects
+        $('.single-select').select2({
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            allowClear: Boolean($(this).data('allow-clear')),
+        });
+
+        $('.multiple-select').select2({
+            theme: 'bootstrap4',
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+            allowClear: Boolean($(this).data('allow-clear')),
+        });
+        
+    });
+</script>
+
+
+<script>
+    $(document).ready(function() {
+        var task = {
+            project_id: '{{ task.project_id }}',
+            priority: '{{ task.priority }}',
+            task_status: '{{ task.task_status }}',
+            is_active: '{{ task.is_active }}',
+            name: '{{ task.name }}',
+            start_date: '{{ task.start_date }}',
+            due_date: '{{ task.due_date }}',
+            contribution: '{{ task.contribution }}',
+            staff_id: '{{ task.staff_id }}',
+            id: '{{ task.id }}',
+        };
+
+        console.log('task', task);
+
+        // Helper function to format date to 'YYYY-MM-DD'
+        function formatDateString(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            if (isNaN(date)) {
+                console.error("Invalid date:", dateString);
+                return '';
+            }
+            return date.toISOString().split('T')[0];
+        }
+
+        // Format start_date and due_date for the input[type="date"] fields
+        const formattedStartDate = formatDateString(task.start_date);
+        const formattedDueDate = formatDateString(task.due_date);
+
+        // Populate form fields
+        $('#edit_project_id').val(task.project_id).trigger('change');
+        $('#edit_priority').val(task.priority).trigger('change');
+        $('#edit_is_active').val(task.is_active).trigger('change');
+        $('#edit_status').val(task.task_status).trigger('change');
+        $('#edit_start').val(formattedStartDate);
+        $('#edit_end').val(formattedDueDate);
+        $('#edit_percentage').val(task.contribution);
+        $('#edit_name').val(task.name);
+        $('#edit_id').val(task.id);
+
+        // Handle staff_id as a multi-select
+        $('#edit_staff_id').val(null).trigger('change');
+        if (task.staff_id) {
+            var staffIdValues = task.staff_id.split(',').map(item => item.trim());
+            $('#edit_staff_id').val(staffIdValues).trigger('change');
+        }
+    });
+
+
+    $("#edit_form").submit(function (e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+            type: 'POST',
+            url: '/task_update/',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.message === 'error') {
+                    showToast('warning', 'Access Denied! You do not have permission to update');
+
+                }
+
+                else if (response.message === 'success') {
+                    showToast('success', 'Task updated successfully');
+                } else {
+                    showToast('error', 'Failed to update Task');
+                }
+            },
+            error: function (xhr, errmsg, err) {
+                showToast('error', "failed to update")
+                console.log(xhr.status + ": " + xhr.responseText);
+            }
+        });
+    });
+
+
+
+</script>
+
