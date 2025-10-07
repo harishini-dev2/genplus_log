@@ -69,13 +69,13 @@ WSGI_APPLICATION = 'project_management.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': os.environ.get('DB_NAME', 'mirra-v2'),
-        'USER': os.environ.get('DB_USER', 'sa'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', 'm7rCPS0IYwtUDoskGu9A35Kf'),
+        'NAME': os.environ.get('DB_NAME', 'ideapro_erp'),
+        'USER': os.environ.get('DB_USER', 'ideapro_genplus'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'Genplus@321'),
         'HOST': os.environ.get('DB_HOST', '69.57.172.213'),
         'PORT': os.environ.get('DB_PORT', ''),
         'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
+           'init_command':"SET sql_mode='STRICT_TRANS_TABLES'"
         },
     }
 }
