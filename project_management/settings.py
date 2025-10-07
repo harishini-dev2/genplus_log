@@ -13,7 +13,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-vev77x&e_#=a=f#b$p*kd
 # SECURITY WARNING: don’t run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ['.vercel.app', 'localhost']
+ALLOWED_HOSTS = ['https://genplus-log-zezh-qostgvz2o-harishini-dev2s-projects.vercel.app/', 'localhost']
 
 # ------------------------------------------------------
 # Applications
